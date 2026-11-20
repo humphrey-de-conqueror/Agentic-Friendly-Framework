@@ -1,0 +1,4 @@
+- insert:
+    - id: agentic-friendly
+      name: '@agentic-friendly/framework'
+      config: {}
