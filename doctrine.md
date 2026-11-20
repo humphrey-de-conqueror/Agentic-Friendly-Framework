@@ -157,3 +157,38 @@ When a solution "doesn't work out", respond with an **escalation ladder keyed on
    - **Human-in-the-loop** — when it is a tradeoff decision or a requirements ambiguity, ask (Section 8). Never burn effort guessing.
 3. **Refuse these anti-patterns:** (a) "try harder with the same thing", (b) rewrite from scratch without knowing the root cause, (c) jump to a shiny alternative without understanding WHY the old one failed.
 4. **Log every dead-end and the lesson** — that is what `logbook.md` is for — so we do not fail the same way twice.
+
+---
+
+## 15. Adopting an Existing Project (Brownfield)
+
+> **The doctrine is not optional on existing code.** The whole purpose is to make complex software easy to maintain and easy to develop. So even when the original project is "super bad", once we step in and continue developing it, we apply these professional philosophies — progressively, never big-bang.
+
+1. **Reconstruct the map first.** A brownfield project rarely ships `metadata.json`. Before writing code, rebuild the map from what already exists, in authority order: `README` → architecture docs / ADRs → `AGENTS.md` / `CONTRIBUTING.md` / `CODEOWNERS` → package manifests / build config → CI workflows → git history → test layout. The reconstructed map is a *hypothesis*: confirm or correct it with the human before trusting it.
+
+2. **The decision gate sets *pace*, not *whether*.** We always apply the doctrine; the codebase's state only changes how fast and how intensely:
+   - **Close to our design** → apply directly, extracting real `metadata.json` for each domain we touch.
+   - **Different but sound** → respect their architecture, map their concepts onto ours (their "module" ≈ our "domain"), conform to their conventions while still adding metadata.
+   - **Big ball of mud** → strangler-fig: every feature or fix we touch becomes a clean domain boundary; leave the untouched mess alone until a change forces contact.
+
+3. **Two ownership modes** (set the mode before starting):
+   - **Full ownership** → we own the codebase. Migrate incrementally: each domain we modify gains a `metadata.json`, an `api/` surface, and co-located tests. Strangle the monolith one bounded context at a time.
+   - **Contributor** → we do not own it. Work happens on **our own branch/fork**, never their mainline. Ship **minimal conforming PRs** in *their* conventions and language; apply the principles **invisibly** — behave professionally, never preach the doctrine to their maintainers.
+
+4. **Contributor protocol (ask → branch → review):**
+   - **Ask for latitude first.** Before touching anything, ask the owner: "Am I free to refactor/extract as I go, or do you want strictly minimal additive changes?" Their answer calibrates how hard we push. (This is §8 HITL applied to *how much* we may reshape.)
+   - **Do the work on a branch.** Our doctrine-intensity is contained there, never on their mainline. The PR review is the gate: if our refactor is too much, they reject it and we fall back to the minimal change. This honors §3 (never break contracts) while still improving structure.
+   - **Let review decide.** The maintainers choose what merges; we do not unilaterally reshape their mainline.
+
+5. **Brownfield translation table.** Every doctrine rule still holds — re-read it for the situation:
+   - Read metadata first → *reconstruct* the map (step 1).
+   - API-only boundaries → respect their existing public surface; never reach into internals.
+   - Append-only versioning → never break their signatures; add, don't mutate.
+   - HITL → ask the owner about ownership, latitude, and ambiguous boundaries.
+   - TDD → test only what we touch; don't demand a rewrite of their test strategy.
+   - Never reinvent → use their established libraries and conventions, not ours.
+   - JIT context → read only the call graph, tests, and docs for the part we change.
+
+6. **Use the tools as instruments:** `render-diagram` draws the *found* architecture as an onboarding aid — confirm the reconstructed map with the human before trusting it. `validate-domains` measures distance from the doctrine, turning a vague "this is messy" into a concrete PASS/WARN/FAIL target list, so even on a super-bad codebase we make *measurable* progress.
+
+7. **Load the skill JIT, don't preach it.** This doctrine is loaded on demand per software task (cheap), not resident in memory all the time — and it is a durable git file, so it is never "forgotten" even after context is compressed. Applying it *invisibly* means behaving well in their language, not skipping the doctrine.

@@ -248,3 +248,23 @@
 - Skill registration (from `@deepseek-ai/dsh-skill`): `ctx.skills.register({ name (kebab), description (non-empty), source, content, whenToUse?, invocation? })` — a runtime skill that appears in the session catalog and loads via the `skill` tool.
 - Local directory install LINKS the checkout, so bundled files stay available at runtime; the `files` array only filters packed bundles.
 - Decision: build incrementally. Step 1 = scaffold bundle + register doctrine as a skill. Later = diagram tool + boundary validator.
+
+## Session 17: Adopting an Existing Project (Brownfield)
+**Date:** 2026-11-20
+
+### Problem 22: How to handle being handed an existing, non-DDD project to continue
+- User asked: what happens when we're dropped into a real-world project that doesn't follow the doctrine — in two ownership modes (full ownership vs contributor)?
+- **Answer (codified as doctrine Section 15):** the doctrine is a *lens + ladder*, not a straightjacket. Reconstruct the missing map from existing artifacts; use a three-case gate; respect ownership mode.
+
+### Key refinement from user
+- The doctrine is NOT optional on existing code. Its whole purpose is to make complex software easy to maintain and easy to develop — so even if the original project is "super bad", once we step in and continue developing, we apply the professional philosophy *progressively* (never big-bang). The decision gate therefore sets *pace/intensity*, not *whether*.
+
+### Contributor protocol (ask → branch → review)
+- **Ask for latitude** before touching anything (HITL applied to "how much may I reshape?").
+- **Work on our own branch/fork**, never their mainline; the PR review is the gate.
+- **Let review decide** — fall back to minimal conforming change if the refactor is rejected.
+- Also resolves a concern the user raised: "apply invisibly" means *don't preach the doctrine to maintainers*, not *don't load it*. The skill is loaded JIT per task (cheap) and is a durable git file (so it can't be "forgotten" even after context compression).
+
+### Plugin completion status
+- Skill `software-dev-expert` + tools `render-diagram` (DOT/PlantUML/Mermaid) + `validate-domains` (metadata + boundary checks) all built, live, and pushed.
+- Dedup done (skill reads repo-root `doctrine.md`), icon added, README added.
