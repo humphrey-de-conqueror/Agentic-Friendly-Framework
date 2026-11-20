@@ -8,6 +8,9 @@
     "./locale/*.json": "./locale/*.json"
   },
   "files": ["index.js", "cordis.patch.yml", "doctrine.md", "locale/*.json"],
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": "*"
+  },
   "dsh": {
     "bundle": { "patch": "./cordis.patch.yml" }
   }
