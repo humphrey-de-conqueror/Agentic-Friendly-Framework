@@ -11,11 +11,12 @@
  * installs link the checkout, so files resolve relative to `import.meta.url`.
  */
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { homedir } from 'node:os'
 import { spawnSync } from 'node:child_process'
 import { defineTool } from '@deepseek-ai/dsh-tools'
+import { validateDomains } from './validate-domains.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DEFAULT_PLANTUML_JAR = join(homedir(), '.local', 'share', 'agentic-friendly', 'plantuml.jar')
@@ -80,6 +81,32 @@ export function apply(ctx) {
       const outFile = renderDiagram(type, format, args.source, base, outDir)
       const bytes = statSync(outFile).size
       return `Rendered ${type} diagram → ${outFile} (${bytes} bytes, ${format}).`
+    },
+  }))
+
+  ctx.tools.register(defineTool({
+    name: 'validate-domains',
+    description:
+      'Validate a project against the agentic-friendly doctrine. Verifies every domain package has a valid '
+      + 'metadata.json (name, version, deployment.mode, exports, dependencies), the standard directory shape '
+      + '(api/ required; entities, repositories, infrastructure, tests recommended), and that declared '
+      + 'cross-domain dependencies resolve to real domains. Returns a pass/warn/fail report.',
+    parameters: {
+      path: {
+        type: 'string',
+        description: 'Project root directory to scan. Default: the workspace working directory.',
+      },
+    },
+    output: {
+      schema: { type: 'string' },
+      render: (_args, value) => [{ type: 'text', text: String(value) }],
+    },
+    async execute(args, exec) {
+      const cwd = exec.agent === undefined
+        ? process.cwd()
+        : await ctx.workingDirectory.ensure(exec.agent, exec.signal)
+      const root = args.path && String(args.path).trim() ? resolve(args.path) : cwd
+      return validateDomains(root)
     },
   }))
 }
