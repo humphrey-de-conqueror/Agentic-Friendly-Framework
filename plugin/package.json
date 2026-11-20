@@ -5,9 +5,10 @@
   "type": "module",
   "exports": {
     ".": "./index.js",
-    "./locale/*.json": "./locale/*.json"
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
   },
-  "files": ["index.js", "validate-domains.js", "cordis.patch.yml", "doctrine.md", "locale/*.json"],
+  "files": ["index.js", "validate-domains.js", "cordis.patch.yml", "locale/*.json", "icon.svg"],
   "peerDependencies": {
     "@deepseek-ai/dsh-tools": "*"
   },

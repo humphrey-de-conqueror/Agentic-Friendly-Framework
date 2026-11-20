@@ -7,8 +7,9 @@
  *      DOT, PlantUML, Mermaid) so an agent never burns an image model on a
  *      class / sequence / dependency diagram.
  *
- * The doctrine body lives beside this file (`doctrine.md`). Local directory
- * installs link the checkout, so files resolve relative to `import.meta.url`.
+ * The doctrine body is the repo-root `doctrine.md` (single canonical copy).
+ * Local directory installs link the checkout and Node realpaths the module URL,
+ * so `../doctrine.md` resolves to the repo root.
  */
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
@@ -23,8 +24,17 @@ const DEFAULT_PLANTUML_JAR = join(homedir(), '.local', 'share', 'agentic-friendl
 
 export const inject = ['skills', 'tools', 'workingDirectory']
 
+// Single canonical doctrine: the repo-root `doctrine.md`. Node realpaths the
+// module URL for linked installs, so `resolve(__dirname, '..')` is the repo root.
+// Fall back to a bundled copy only for a future packed distribution.
+function resolveDoctrine() {
+  const root = resolve(__dirname, '..', 'doctrine.md')
+  const bundled = join(__dirname, 'doctrine.md')
+  return existsSync(root) ? root : bundled
+}
+
 export function apply(ctx) {
-  const content = readFileSync(join(__dirname, 'doctrine.md'), 'utf8')
+  const content = readFileSync(resolveDoctrine(), 'utf8')
 
   ctx.skills.register({
     name: 'software-dev-expert',
